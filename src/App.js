@@ -61,8 +61,8 @@ function App() {
     );
   };
 
-  const addKeyword = (itemToEdit, keywordToAdd) => {
-    const alreadyAdded = () => {
+  const addKeyword = (itemToEdit, keywordsToAdd) => {
+    const alreadyAdded = (keywordToAdd) => {
       let found = false;
       seriesList.forEach((item) => {
         if (item.title === itemToEdit) {
@@ -76,20 +76,29 @@ function App() {
       return found;
     };
 
-    if (!alreadyAdded()) {
-      setSeriesList((listData) =>
-        listData.map((item) => {
-          if (item.title === itemToEdit) {
-            return {
-              title: item.title,
-              keywords: [...item.keywords, keywordToAdd],
-            };
-          } else {
-            return item;
-          }
-        })
-      );
+    const unique = (value, index, self) => {
+      return self.indexOf(value) === index;
     }
+
+    let newKeywordArr = keywordsToAdd.split(",");
+    newKeywordArr = newKeywordArr.map((keyword) => keyword.trim()).filter(unique);
+
+    newKeywordArr.forEach((keywordToAdd) => {
+      if (keywordToAdd && !alreadyAdded(keywordToAdd)) {
+        setSeriesList((listData) =>
+          listData.map((item) => {
+            if (item.title === itemToEdit) {
+              return {
+                title: item.title,
+                keywords: [...item.keywords, keywordToAdd],
+              };
+            } else {
+              return item;
+            }
+          })
+        );
+      }
+    });
   };
 
   const deleteKeyword = (itemToEdit, keywordToDelete) => {
