@@ -16,7 +16,7 @@ function App() {
   const [newSeries, setNewSeries] = useState("");
 
   useEffect(() => {
-    // chrome.storage.local.get(['seriesList'], (res)=>{
+    // chrome.storage.local.get(['seriesList'], (res) => {
     //   const storedList = res.seriesList || [];
     //   setSeriesList(storedList);
     // });
@@ -52,19 +52,34 @@ function App() {
   };
 
   const addKeyword = (itemToEdit, keyword) => {
-    setSeriesList((listData) =>
-      listData.map((item) => {
+    const alreadyAdded = () => {
+      let found = false;
+      seriesList.forEach((item) => {
         if (item.title === itemToEdit) {
-          return {
-            title: item.title,
-            keywords: [...item.keywords, keyword],
-          };
-        } else {
-          return item;
+          item.keywords.forEach((itemKeyword) => {
+            if (itemKeyword === keyword) {
+              found = true;
+            }
+          });
         }
-      })
-    );
-    console.log(seriesList)
+      });
+      return found;
+    };
+
+    if (!alreadyAdded()) {
+      setSeriesList((listData) =>
+        listData.map((item) => {
+          if (item.title === itemToEdit) {
+            return {
+              title: item.title,
+              keywords: [...item.keywords, keyword],
+            };
+          } else {
+            return item;
+          }
+        })
+      );
+    }
   };
 
   const deleteKeyword = (itemToEdit, keywordToDelete) => {
