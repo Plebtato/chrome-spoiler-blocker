@@ -1,8 +1,6 @@
 import "./App.css";
 import React from "react";
 import { useState, useEffect } from "react";
-// import SeriesList from "./components/SeriesList";
-// import Searchbar from "./components/Searchbar";
 import SeriesCard from "./components/SeriesCard";
 import {
   Navbar,
@@ -30,8 +28,8 @@ function App() {
 
     const alreadyAdded = (title) => {
       let found = false;
-      seriesList.map((item) => {
-        if (item.title == title) {
+      seriesList.forEach((item) => {
+        if (item.title === title) {
           found = true;
         }
       });
@@ -41,20 +39,39 @@ function App() {
     if (newSeries && !alreadyAdded(newSeries)) {
       const newSeriesInfo = {
         title: newSeries,
-        keywords: [],
+        keywords: [newSeries],
       };
       setSeriesList((listData) => [...listData, newSeriesInfo]);
-    };
+    }
     setNewSeries("");
-  };
-
-  const editListItem = (itemToEdit) => {
-    console.log("WIP");
   };
 
   const deleteListItem = (itemToDelete) => {
     setSeriesList((listData) =>
       listData.filter((item) => item.title !== itemToDelete)
+    );
+  };
+
+  const addKeyword = (itemToEdit, keyword) => {
+    console.log(itemToEdit);
+    console.log(keyword);
+  };
+
+  const deleteKeyword = (itemToEdit, keywordToDelete) => {
+    setSeriesList((listData) =>
+      listData.map((item) => {
+        if (item.title === itemToEdit) {
+          const newKeywords = item.keywords.filter(
+            (keyword) => keyword !== keywordToDelete
+          );
+          return {
+            title: item.title,
+            keywords: newKeywords,
+          };
+        } else {
+          return item;
+        }
+      })
     );
   };
 
@@ -69,15 +86,16 @@ function App() {
         {seriesList.map((item) => (
           <SeriesCard
             item={item}
-            edit={editListItem}
-            remove={deleteListItem}
+            addKeyword={addKeyword}
+            deleteKeyword={deleteKeyword}
+            deleteItem={deleteListItem}
             key={item.title}
           />
         ))}
       </ListGroup>
-      <div className="bottom-bar"/>
+      <div className="bottom-bar" />
       <Navbar bg="dark" variant="dark" fixed="bottom">
-        <Form onSubmit={addListItem} className='add-form'>
+        <Form onSubmit={addListItem} className="add-form">
           <InputGroup>
             <FormControl
               placeholder="Enter a show"
