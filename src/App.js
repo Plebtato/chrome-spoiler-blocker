@@ -1,3 +1,5 @@
+/*global chrome*/
+
 import React from "react";
 import { useState, useEffect } from "react";
 import SeriesCard from "./components/SeriesCard";
@@ -14,13 +16,21 @@ import {
 function App() {
   const [seriesList, setSeriesList] = useState([]);
   const [newSeries, setNewSeries] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // chrome.storage.local.get(['seriesList'], (res) => {
-    //   const storedList = res.seriesList || [];
-    //   setSeriesList(storedList);
-    // });
+    chrome.storage.local.get(['seriesList'], (res) => {
+      const storedList = res.seriesList || [];
+      setSeriesList(storedList);
+      setLoading(false);
+    });
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      chrome.storage.local.set({seriesList:seriesList});
+    }
+  }, [seriesList])
 
   const addListItem = (e) => {
     e.preventDefault();
