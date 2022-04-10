@@ -1,4 +1,3 @@
-import "./App.css";
 import React from "react";
 import { useState, useEffect } from "react";
 import SeriesCard from "./components/SeriesCard";
@@ -53,8 +52,19 @@ function App() {
   };
 
   const addKeyword = (itemToEdit, keyword) => {
-    console.log(itemToEdit);
-    console.log(keyword);
+    setSeriesList((listData) =>
+      listData.map((item) => {
+        if (item.title === itemToEdit) {
+          return {
+            title: item.title,
+            keywords: [...item.keywords, keyword],
+          };
+        } else {
+          return item;
+        }
+      })
+    );
+    console.log(seriesList)
   };
 
   const deleteKeyword = (itemToEdit, keywordToDelete) => {

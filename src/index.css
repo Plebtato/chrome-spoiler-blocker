@@ -13,3 +13,17 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.series-list {
+  padding-bottom: 70px;
+}
+
+.add-form {
+  width: 100%;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.keyword-badge {
+  margin: 2px;
+}

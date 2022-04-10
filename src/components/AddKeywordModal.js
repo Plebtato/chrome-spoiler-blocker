@@ -1,38 +1,49 @@
-import { Button, Modal, Form } from "react-bootstrap";
+import { Button, Modal, Form, FormControl, FormText } from "react-bootstrap";
 import { useState } from "react";
 
 const AddKeywordModal = ({ show, handleClose, item, addKeyword }) => {
   const [newKeyword, setNewKeyword] = useState("");
 
+  const closeModal = () => {
+    handleClose();
+    setNewKeyword("");
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    addKeyword(item, newKeyword);
+    closeModal();
+  };
+
   return (
-    <Modal show={show} onHide={handleClose} centered>
+    <Modal show={show} onHide={closeModal} centered>
       <Modal.Header closeButton>
         <Modal.Title>Add keywords</Modal.Title>
       </Modal.Header>
 
-      <Form.Group controlId="formBasicEmail" onSubmit={addKeyword(item, newKeyword)}>
+      <Form onSubmit={handleSubmit}>
         <Modal.Body>
-          <Form.Control
+          <FormControl
             type="text"
-            placeholder="Characters, other titles for the series, etc"
+            placeholder="Characters, other series names, etc"
             required
             value={newKeyword}
             onChange={(e) => setNewKeyword(e.target.value)}
           />
-          <Form.Text className="text-muted">
+          <FormText className="text-muted">
             Add several keywords by separating them with commas.
-          </Form.Text>
+          </FormText>
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={closeModal}>
             Close
           </Button>
-          <Button variant="primary" type="submit" onClick={handleClose} disabled={!newKeyword}>
+          <Button variant="primary" type="submit" disabled={!newKeyword}>
             Save Changes
           </Button>
         </Modal.Footer>
-      </Form.Group>
+      </Form>
     </Modal>
   );
 };
