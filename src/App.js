@@ -51,13 +51,13 @@ function App() {
     );
   };
 
-  const addKeyword = (itemToEdit, keyword) => {
+  const addKeyword = (itemToEdit, keywordToAdd) => {
     const alreadyAdded = () => {
       let found = false;
       seriesList.forEach((item) => {
         if (item.title === itemToEdit) {
-          item.keywords.forEach((itemKeyword) => {
-            if (itemKeyword === keyword) {
+          item.keywords.forEach((keyword) => {
+            if (keyword === keywordToAdd) {
               found = true;
             }
           });
@@ -72,7 +72,7 @@ function App() {
           if (item.title === itemToEdit) {
             return {
               title: item.title,
-              keywords: [...item.keywords, keyword],
+              keywords: [...item.keywords, keywordToAdd],
             };
           } else {
             return item;
