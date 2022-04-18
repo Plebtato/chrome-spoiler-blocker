@@ -30,7 +30,7 @@ function App() {
     if (!loading) {
       chrome.storage.local.set({seriesList:seriesList});
     }
-  }, [seriesList])
+  }, [seriesList, loading])
 
   const addListItem = (e) => {
     e.preventDefault();
