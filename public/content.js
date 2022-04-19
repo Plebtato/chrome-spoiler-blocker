@@ -1,27 +1,31 @@
 /*global chrome*/
 
-// change to specific elements? https://www.w3schools.com/jsref/met_document_queryselectorall.asp
 const getElements = (seriesList) => {
   let spoilerElements = [];
-  const elements = document.querySelectorAll("h1, h2, h3, h4, h5, p, li, td, caption, span, a");
-  // nodelist to array?
+  const elements = document.querySelectorAll(
+    "h1, h2, h3, h4, h5, p, li, td, caption, span, a"
+  );
 
   for (const element of elements) {
-    const matchingSeries = seriesList.map((series) => {
-      const matchingKeywords = series.keywords.filter((keyword) => {
-        return element.innerText.toLowerCase().includes(keyword.toLowerCase());
-        // check textContent vs innerText vs innerHTML
-      });
-      if (matchingKeywords.length > 0) {
-        const matchingSeriesInfo = {
-          title: series,
-          keywords: matchingKeywords,
-        };
-        return matchingSeriesInfo;
-      }
-    });
+    const matchingSeries = seriesList
+      .map((series) => {
+        const matchingKeywords = series.keywords.filter((keyword) => {
+          return element.innerText
+            .toLowerCase()
+            .includes(keyword.toLowerCase());
+          // check textContent vs innerText vs innerHTML
+        });
+        if (matchingKeywords.length > 0) {
+          const matchingSeriesInfo = {
+            title: series.title,
+            keywords: matchingKeywords,
+          };
+          return matchingSeriesInfo;
+        }
+      })
+      .filter((series) => series !== undefined);
 
-    if (matchingSeries[0] !== undefined) {
+    if (matchingSeries.length > 0) {
       const elementInfo = {
         element: element,
         series: matchingSeries,
@@ -32,11 +36,30 @@ const getElements = (seriesList) => {
   return spoilerElements;
 };
 
-const spoilerFilter = (seriesList) => {
-  // const spoilerElements = getElements(seriesList);
-  console.log(getElements([{ title: "test", keywords: ["otherwise"] }]));
+const filterSpoilers = (seriesList) => {
+  const spoilerElements = getElements(seriesList);
+
+  spoilerElements.forEach((spoiler) => {
+    let spoilerInfo = "";
+    spoiler.series.forEach((series) => {
+      spoilerInfo += "Potential spoilers for " + series.title + " detected.\n" + "Keyword(s): " + series.keywords.join(", ") + "\n\n";
+    });
+    console.log(spoilerInfo);
+    spoiler.element.style.backgroundColor = "#000000";
+    spoiler.element.style.color = "#000000";
+    // add interactivity
+    // spoiler.element.addEventListener("click", showSpoiler);
+    // spoiler.element.addEventListener("mouseover", showInfo);
+  });
 };
 
+let seriesList;
+chrome.storage.local.get(["seriesList"], (res) => {
+  seriesList = res.seriesList || [];
+  filterSpoilers(seriesList);
+});
+
+// add message trigger when new keyword or series is added
 // chrome.runtime.onStartup.addListener(() => {
 //   let seriesList;
 //   chrome.storage.local.get(["seriesList"], (res) => {
@@ -45,13 +68,6 @@ const spoilerFilter = (seriesList) => {
 //   spoilerFilter(seriesList);
 //   console.log('message received')
 // });
-
-let seriesList;
-chrome.storage.local.get(["seriesList"], (res) => {
-  seriesList = res.seriesList || [];
-  // console.log(seriesList);
-  spoilerFilter(seriesList);
-});
 
 // change to on page load?
 // https://developer.chrome.com/docs/extensions/reference/runtime/#method-reload
