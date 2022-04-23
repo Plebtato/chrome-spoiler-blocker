@@ -10,10 +10,9 @@ const getElements = (seriesList) => {
     const matchingSeries = seriesList
       .map((series) => {
         const matchingKeywords = series.keywords.filter((keyword) => {
-          return element.innerText
+          return element.textContent
             .toLowerCase()
             .includes(keyword.toLowerCase());
-          // check textContent vs innerText vs innerHTML
         });
         if (matchingKeywords.length > 0) {
           const matchingSeriesInfo = {
@@ -36,20 +35,79 @@ const getElements = (seriesList) => {
   return spoilerElements;
 };
 
+const revealSpoiler = (element, bg, color) => {
+  element.style.backgroundColor = bg;
+  element.style.color = color;
+};
+
+const createSpoilerInfoBox = (element, spoilerInfo) => {
+  const node = document.createElement("span");
+  const textnode = document.createTextNode(spoilerInfo);
+
+  node.style.visibility = "hidden";
+  node.style.width = "20vw";
+  node.style.backgroundColor = "black";
+  node.style.color = "#fff";
+  node.style.textAlign = "center";
+  node.style.padding = "5px 0";
+  node.style.borderRadius = "6px";
+  node.style.fontSize = "15px";
+  node.style.whiteSpace = "pre-line";
+  node.style.zIndex = "99999";
+  node.style.position = "fixed";
+
+  element.onmousemove = (e) => {
+    let x = e.clientX;
+    let y = e.clientY;
+    node.style.top = y + 10 + "px";
+    node.style.left = x + 10 + "px";
+  };
+
+  node.appendChild(textnode);
+  element.appendChild(node);
+  return node;
+};
+
+const showSpoilerInfoBox = (element) => {
+  element.style.visibility = "visible";
+};
+
+const hideSpoilerInfoBox = (element) => {
+  element.style.visibility = "hidden";
+};
+
 const filterSpoilers = (seriesList) => {
   const spoilerElements = getElements(seriesList);
 
   spoilerElements.forEach((spoiler) => {
     let spoilerInfo = "";
     spoiler.series.forEach((series) => {
-      spoilerInfo += "Potential spoilers for " + series.title + " detected.\n" + "Keyword(s): " + series.keywords.join(", ") + "\n\n";
+      if (spoilerInfo) {
+        spoilerInfo += "\n\n";
+      }
+      spoilerInfo +=
+        "Potential spoilers for " +
+        series.title +
+        " detected.\n" +
+        "Keyword(s): " +
+        series.keywords.join(", ");
     });
-    console.log(spoilerInfo);
-    spoiler.element.style.backgroundColor = "#000000";
-    spoiler.element.style.color = "#000000";
-    // add interactivity
-    // spoiler.element.addEventListener("click", showSpoiler);
-    // spoiler.element.addEventListener("mouseover", showInfo);
+
+    const infoBox = createSpoilerInfoBox(spoiler.element, spoilerInfo);
+
+    // const originalBG = spoiler.element.style.backgroundColor;
+    // const originalColor = spoiler.element.style.color;
+    // spoiler.element.style.backgroundColor = "#000000";
+    // spoiler.element.style.color = "#000000";
+
+    // spoiler.element.addEventListener("click", () => revealSpoiler(spoiler.element, originalBG, originalColor));
+
+    spoiler.element.addEventListener("mouseenter", () =>
+      showSpoilerInfoBox(infoBox)
+    );
+    spoiler.element.addEventListener("mouseleave", () =>
+      hideSpoilerInfoBox(infoBox)
+    );
   });
 };
 
@@ -60,7 +118,7 @@ chrome.storage.local.get(["seriesList"], (res) => {
 });
 
 // add message trigger when new keyword or series is added
-// chrome.runtime.onStartup.addListener(() => {
+// chrome.runtime.onMessage.addListener(() => {
 //   let seriesList;
 //   chrome.storage.local.get(["seriesList"], (res) => {
 //     seriesList = res.seriesList || [];
@@ -68,14 +126,3 @@ chrome.storage.local.get(["seriesList"], (res) => {
 //   spoilerFilter(seriesList);
 //   console.log('message received')
 // });
-
-// change to on page load?
-// https://developer.chrome.com/docs/extensions/reference/runtime/#method-reload
-// handled by content script declarative injection
-// not sure where spoilerFilter should be called
-// add message event when list is updated
-
-// content scripts
-// https://developer.chrome.com/docs/extensions/mv3/content_scripts/
-// how to inject scripts
-// check to make sure manifest is correct
