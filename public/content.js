@@ -3,8 +3,9 @@
 const getElements = (seriesList) => {
   let spoilerElements = [];
   const elements = document.querySelectorAll(
-    "h1, h2, h3, h4, h5, p, li, td, caption, span, a"
+    "h1, h2, h3, h4, h5, p, li, td, caption, span"
   );
+  // include a?
 
   for (const element of elements) {
     const matchingSeries = seriesList
@@ -129,6 +130,8 @@ const filterSpoilers = (seriesList) => {
     );
   });
 };
+
+// add handling for nested spoilers
 
 let seriesList;
 chrome.storage.local.get(["seriesList"], (res) => {
