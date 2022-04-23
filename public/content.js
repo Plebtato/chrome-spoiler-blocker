@@ -91,7 +91,11 @@ const showSpoiler = (element, bg, color) => {
 
   const childElements = element.children;
   for (const child of childElements) {
-    child.style.visibility = "initial";
+    if (child.className === "spoiler-info-box") {
+      child.style.visibility = "hidden";
+    } else {
+      child.style.visibility = "initial";
+    }
   }
 };
 
