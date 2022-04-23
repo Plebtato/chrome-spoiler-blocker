@@ -35,13 +35,9 @@ const getElements = (seriesList) => {
   return spoilerElements;
 };
 
-const revealSpoiler = (element, bg, color) => {
-  element.style.backgroundColor = bg;
-  element.style.color = color;
-};
-
 const createSpoilerInfoBox = (element, spoilerInfo) => {
   const node = document.createElement("span");
+  node.className = "spoiler-info-box";
   const textnode = document.createTextNode(spoilerInfo);
 
   node.style.visibility = "hidden";
@@ -76,6 +72,28 @@ const hideSpoilerInfoBox = (element) => {
   element.style.visibility = "hidden";
 };
 
+const hideSpoiler = (element) => {
+  element.style.backgroundColor = "#000000";
+  element.style.color = "#000000";
+
+  const childElements = element.children;
+  for (const child of childElements) {
+    if (child.className !== "spoiler-info-box") {
+      child.style.visibility = "hidden";
+    }
+  }
+};
+
+const showSpoiler = (element, bg, color) => {
+  element.style.backgroundColor = bg;
+  element.style.color = color;
+
+  const childElements = element.children;
+  for (const child of childElements) {
+    child.style.visibility = "initial";
+  }
+};
+
 const filterSpoilers = (seriesList) => {
   const spoilerElements = getElements(seriesList);
 
@@ -95,12 +113,13 @@ const filterSpoilers = (seriesList) => {
 
     const infoBox = createSpoilerInfoBox(spoiler.element, spoilerInfo);
 
-    // const originalBG = spoiler.element.style.backgroundColor;
-    // const originalColor = spoiler.element.style.color;
-    // spoiler.element.style.backgroundColor = "#000000";
-    // spoiler.element.style.color = "#000000";
+    const originalBG = spoiler.element.style.backgroundColor;
+    const originalColor = spoiler.element.style.color;
+    hideSpoiler(spoiler.element);
 
-    // spoiler.element.addEventListener("click", () => revealSpoiler(spoiler.element, originalBG, originalColor));
+    spoiler.element.addEventListener("click", () =>
+      showSpoiler(spoiler.element, originalBG, originalColor)
+    );
 
     spoiler.element.addEventListener("mouseenter", () =>
       showSpoilerInfoBox(infoBox)
