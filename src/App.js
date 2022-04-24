@@ -17,6 +17,7 @@ function App() {
   const [seriesList, setSeriesList] = useState([]);
   const [newSeries, setNewSeries] = useState("");
   const [loading, setLoading] = useState(true);
+  const [requireReload, setRequireReload] = useState(false);
 
   useEffect(() => {
     chrome.storage.local.get(['seriesList'], (res) => {
@@ -51,6 +52,7 @@ function App() {
         keywords: [newSeries],
       };
       setSeriesList((listData) => [...listData, newSeriesInfo]);
+      setRequireReload(true);
     }
     setNewSeries("");
   };
@@ -59,6 +61,7 @@ function App() {
     setSeriesList((listData) =>
       listData.filter((item) => item.title !== itemToDelete)
     );
+    setRequireReload(true);
   };
 
   const addKeyword = (itemToEdit, keywordsToAdd) => {
@@ -97,6 +100,7 @@ function App() {
             }
           })
         );
+        setRequireReload(true);
       }
     });
   };
@@ -117,13 +121,15 @@ function App() {
         }
       })
     );
+    setRequireReload(true);
   };
 
   return (
     <>
       <Navbar bg="dark" variant="dark">
         <Container>
-          <Navbar.Brand className="title">Spoiler Blocker</Navbar.Brand>
+          <Navbar.Brand className="title">No Spoilers!</Navbar.Brand>
+          {requireReload && <Navbar.Text>Refresh to apply changes.</Navbar.Text>}
         </Container>
       </Navbar>
       <ListGroup variant="flush" className="series-list">
