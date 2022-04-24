@@ -3,17 +3,16 @@
 const getElements = (seriesList) => {
   let spoilerElements = [];
   const elements = document.querySelectorAll(
-    "h1, h2, h3, h4, h5, p, li, td, caption, span"
+    "h1, h2, h3, h4, h5, p, td, caption, span, .ytd-comment-renderer, .ytd-video-primary-info-renderer, .ytd-video-secondary-info-renderer, .ytd-compact-video-render"
   );
-  // include a?
+  // include a? li?
 
   for (const element of elements) {
     const matchingSeries = seriesList
       .map((series) => {
         const matchingKeywords = series.keywords.filter((keyword) => {
-          return element.textContent
-            .toLowerCase()
-            .includes(keyword.toLowerCase());
+          const re = new RegExp("\\b" + keyword.toLowerCase() + "\\b")
+          return re.test(element.textContent.toLowerCase());
         });
         if (matchingKeywords.length > 0) {
           const matchingSeriesInfo = {
@@ -76,7 +75,7 @@ const hideSpoilerInfoBox = (element) => {
 const hideSpoiler = (element) => {
   element.style.backgroundColor = "#000000";
   element.style.color = "#000000";
-
+  // only hide if parent is not already hidden?
   const childElements = element.children;
   for (const child of childElements) {
     if (child.className !== "spoiler-info-box") {
