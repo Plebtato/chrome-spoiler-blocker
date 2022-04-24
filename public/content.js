@@ -5,13 +5,13 @@ const getElements = (seriesList) => {
   const elements = document.querySelectorAll(
     "h1, h2, h3, h4, h5, p, td, caption, span, .ytd-comment-renderer, .ytd-video-primary-info-renderer, .ytd-video-secondary-info-renderer, .ytd-compact-video-render"
   );
-  // include a? li?
+  // include a? li? div?
 
   for (const element of elements) {
     const matchingSeries = seriesList
       .map((series) => {
         const matchingKeywords = series.keywords.filter((keyword) => {
-          const re = new RegExp("\\b" + keyword.toLowerCase() + "\\b")
+          const re = new RegExp("\\b" + keyword.toLowerCase() + "\\b");
           return re.test(element.textContent.toLowerCase());
         });
         if (matchingKeywords.length > 0) {
@@ -120,10 +120,15 @@ const filterSpoilers = (seriesList) => {
     const originalBG = spoiler.element.style.backgroundColor;
     const originalColor = spoiler.element.style.color;
     hideSpoiler(spoiler.element);
+    let hidden = true;
 
-    spoiler.element.addEventListener("click", () =>
-      showSpoiler(spoiler.element, originalBG, originalColor)
-    );
+    spoiler.element.addEventListener("click", (e) => {
+      if (hidden) {
+        e.preventDefault();
+        showSpoiler(spoiler.element, originalBG, originalColor);
+        hidden = false;
+      }
+    });
 
     spoiler.element.addEventListener("mouseenter", () =>
       showSpoilerInfoBox(infoBox)
