@@ -11,6 +11,7 @@ import {
   FormControl,
   Button,
   ListGroup,
+  Spinner,
 } from "react-bootstrap";
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
     const updateList = (newSeriesInfo) => {
       setSeriesList((listData) => [...listData, newSeriesInfo]);
       setRequireReload(true);
+      setLoading(false);
     };
 
     if (newSeries && !alreadyAdded(newSeries)) {
@@ -61,6 +63,7 @@ function App() {
       };
 
       if (enableAutofill) {
+        setLoading(true);
         fetch(`https://imdb-api.com/en/API/SearchTitle/${apiKey}/${newSeries}`)
           .then((response) => response.json())
           .then((responseData) => {
@@ -77,7 +80,8 @@ function App() {
                       if (responseData2.actors[i] === undefined) {
                         break;
                       }
-                      const characterKeyword = responseData2.actors[i].asCharacter.split(/\s\d|\s\//);
+                      const characterKeyword =
+                        responseData2.actors[i].asCharacter.split(/\s\d|\s\//);
                       console.log(characterKeyword);
                       newSeriesInfo.keywords.push(characterKeyword[0]);
                     }
@@ -218,6 +222,15 @@ function App() {
           />
         </Form>
       </Navbar>
+      {loading && (
+        <div className="loading-overlay">
+          <Spinner
+            className="loading-spinner"
+            animation="border"
+            variant="light"
+          />
+        </div>
+      )}
     </>
   );
 }
