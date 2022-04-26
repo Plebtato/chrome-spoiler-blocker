@@ -16,22 +16,25 @@ import {
 function App() {
   const [seriesList, setSeriesList] = useState([]);
   const [newSeries, setNewSeries] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [requireReload, setRequireReload] = useState(false);
+  const [enableAutofill, setEnableAutofill] = useState(false);
+  const apiKey = process.env.REACT_APP_IMDB_API_KEY;
 
   useEffect(() => {
-    chrome.storage.local.get(['seriesList'], (res) => {
+    chrome.storage.local.get(["seriesList"], (res) => {
       const storedList = res.seriesList || [];
       setSeriesList(storedList);
-      setLoading(false);
+      setInitialLoad(false);
     });
   }, []);
 
   useEffect(() => {
-    if (!loading) {
-      chrome.storage.local.set({seriesList:seriesList});
+    if (!initialLoad) {
+      chrome.storage.local.set({ seriesList: seriesList });
     }
-  }, [seriesList, loading])
+  }, [seriesList, initialLoad]);
 
   const addListItem = (e) => {
     e.preventDefault();
@@ -47,12 +50,32 @@ function App() {
     };
 
     if (newSeries && !alreadyAdded(newSeries)) {
-      const newSeriesInfo = {
+      let newSeriesInfo = {
         title: newSeries,
         keywords: [newSeries],
       };
-      setSeriesList((listData) => [...listData, newSeriesInfo]);
-      setRequireReload(true);
+
+      if (enableAutofill) {
+        fetch(`https://imdb-api.com/en/API/SearchTitle/${apiKey}/${newSeries}`)
+          .then((response) => {
+            return response.json();
+          })
+          .then((responseData) => {
+            console.log(responseData);
+            if (responseData.length > 0) {
+              newSeriesInfo.title = responseData[0].title;
+              const id = responseData[0].id;
+            }
+            setSeriesList((listData) => [...listData, newSeriesInfo]);
+            setRequireReload(true);
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      } else {
+        setSeriesList((listData) => [...listData, newSeriesInfo]);
+        setRequireReload(true);
+      }
     }
     setNewSeries("");
   };
@@ -81,10 +104,12 @@ function App() {
 
     const unique = (value, index, self) => {
       return self.indexOf(value) === index;
-    }
+    };
 
     let newKeywordArr = keywordsToAdd.split(",");
-    newKeywordArr = newKeywordArr.map((keyword) => keyword.trim()).filter(unique);
+    newKeywordArr = newKeywordArr
+      .map((keyword) => keyword.trim())
+      .filter(unique);
 
     newKeywordArr.forEach((keywordToAdd) => {
       if (keywordToAdd && !alreadyAdded(keywordToAdd)) {
@@ -129,7 +154,9 @@ function App() {
       <Navbar bg="dark" variant="dark">
         <Container>
           <Navbar.Brand className="title">No Spoilers!</Navbar.Brand>
-          {requireReload && <Navbar.Text>Refresh to apply changes.</Navbar.Text>}
+          {requireReload && (
+            <Navbar.Text>Refresh to apply changes.</Navbar.Text>
+          )}
         </Container>
       </Navbar>
       <ListGroup variant="flush" className="series-list">
@@ -151,7 +178,7 @@ function App() {
               placeholder="Enter a show"
               aria-label="Enter a show"
               aria-describedby="basic-addon2"
-              type="text"
+              type="search"
               required
               value={newSeries}
               onChange={(e) => setNewSeries(e.target.value)}

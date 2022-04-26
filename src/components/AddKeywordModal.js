@@ -30,6 +30,7 @@ const AddKeywordModal = ({ show, handleClose, item, addKeyword }) => {
             value={newKeyword}
             onChange={(e) => setNewKeyword(e.target.value)}
           />
+          <br/>
           <FormText className="text-muted">
             Add several keywords by separating them with commas.
           </FormText>
