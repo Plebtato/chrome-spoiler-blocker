@@ -49,6 +49,11 @@ function App() {
       return found;
     };
 
+    const updateList = (newSeriesInfo) => {
+      setSeriesList((listData) => [...listData, newSeriesInfo]);
+      setRequireReload(true);
+    };
+
     if (newSeries && !alreadyAdded(newSeries)) {
       let newSeriesInfo = {
         title: newSeries,
@@ -57,24 +62,36 @@ function App() {
 
       if (enableAutofill) {
         fetch(`https://imdb-api.com/en/API/SearchTitle/${apiKey}/${newSeries}`)
-          .then((response) => {
-            return response.json();
-          })
+          .then((response) => response.json())
           .then((responseData) => {
-            console.log(responseData);
-            if (responseData.length > 0) {
-              newSeriesInfo.title = responseData[0].title;
-              const id = responseData[0].id;
+            if (responseData.results.length > 0) {
+              const id = responseData.results[0].id;
+              newSeriesInfo.title = responseData.results[0].title;
+              newSeriesInfo.keywords[0] = responseData.results[0].title;
+
+              fetch(`https://imdb-api.com/en/API/FullCast/${apiKey}/${id}`)
+                .then((response2) => response2.json())
+                .then((responseData2) => {
+                  if (responseData2.actors != null) {
+                    for (let i = 0; i < 10; i++) {
+                      if (responseData2.actors[i] === undefined) {
+                        break;
+                      }
+                      const characterKeyword = responseData2.actors[i].asCharacter.split(/\s\d|\s\//);
+                      console.log(characterKeyword);
+                      newSeriesInfo.keywords.push(characterKeyword[0]);
+                    }
+                  }
+                  updateList(newSeriesInfo);
+                })
+                .catch((err2) => console.error(err2));
+            } else {
+              updateList(newSeriesInfo);
             }
-            setSeriesList((listData) => [...listData, newSeriesInfo]);
-            setRequireReload(true);
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       } else {
-        setSeriesList((listData) => [...listData, newSeriesInfo]);
-        setRequireReload(true);
+        updateList(newSeriesInfo);
       }
     }
     setNewSeries("");
@@ -192,7 +209,13 @@ function App() {
               Add
             </Button>
           </InputGroup>
-          <Form.Check className="autofill-toggle-button" type="checkbox" label="Automatically fill keywords with IMDB data" checked={enableAutofill} onChange={(e) => setEnableAutofill(prev => !prev)}/>
+          <Form.Check
+            className="autofill-toggle-button"
+            type="checkbox"
+            label="Automatically fill keywords with IMDB data"
+            checked={enableAutofill}
+            onChange={(e) => setEnableAutofill((prev) => !prev)}
+          />
         </Form>
       </Navbar>
     </>
