@@ -173,7 +173,7 @@ function App() {
       <div className="bottom-bar" />
       <Navbar bg="dark" variant="dark" fixed="bottom">
         <Form onSubmit={addListItem} className="add-form">
-          <InputGroup>
+          <InputGroup className="mb-2">
             <FormControl
               placeholder="Enter a show"
               aria-label="Enter a show"
@@ -192,6 +192,7 @@ function App() {
               Add
             </Button>
           </InputGroup>
+          <Form.Check className="autofill-toggle-button" type="checkbox" label="Automatically fill keywords with IMDB data" checked={enableAutofill} onChange={(e) => setEnableAutofill(prev => !prev)}/>
         </Form>
       </Navbar>
     </>
