@@ -3,7 +3,7 @@
 const getElements = (seriesList) => {
   let spoilerElements = [];
   const elements = document.querySelectorAll(
-    "h1, h2, h3, h4, h5, p, td, caption, span, .ytd-comment-renderer, .ytd-video-primary-info-renderer, .ytd-video-secondary-info-renderer, .ytd-compact-video-render"
+    "h1:not(.spoiler-filter-blocked), h2:not(.spoiler-filter-blocked), h3:not(.spoiler-filter-blocked), h4:not(.spoiler-filter-blocked), h5:not(.spoiler-filter-blocked), p:not(.spoiler-filter-blocked), td:not(.spoiler-filter-blocked), caption:not(.spoiler-filter-blocked), span:not(.spoiler-filter-blocked)"
   );
   // include a? li? div?
 
@@ -29,6 +29,7 @@ const getElements = (seriesList) => {
         element: element,
         series: matchingSeries,
       };
+      element.classList.add("spoiler-filter-blocked");
       spoilerElements.push(elementInfo);
     }
   }
@@ -37,7 +38,8 @@ const getElements = (seriesList) => {
 
 const createSpoilerInfoBox = (element, spoilerInfo) => {
   const node = document.createElement("span");
-  node.className = "spoiler-info-box";
+  node.classList.add("spoiler-blocker-info-box");
+  node.classList.add("spoiler-filter-blocked");
   const textnode = document.createTextNode(spoilerInfo);
 
   node.style.visibility = "hidden";
@@ -48,6 +50,9 @@ const createSpoilerInfoBox = (element, spoilerInfo) => {
   node.style.padding = "5px 0";
   node.style.borderRadius = "6px";
   node.style.fontSize = "15px";
+  node.style.fontFamily = "Arial, sans-serif";
+  node.style.fontWeight = "normal";
+  node.style.fontStyle = "normal";
   node.style.whiteSpace = "pre-line";
   node.style.zIndex = "99999";
   node.style.position = "fixed";
@@ -65,11 +70,15 @@ const createSpoilerInfoBox = (element, spoilerInfo) => {
 };
 
 const showSpoilerInfoBox = (element) => {
-  element.style.visibility = "visible";
+  if (!element.classList.contains("spoiler-blocker-info-box-disabled")) {
+    element.style.visibility = "visible";
+  }
 };
 
 const hideSpoilerInfoBox = (element) => {
-  element.style.visibility = "hidden";
+  if (!element.classList.contains("spoiler-blocker-info-box-disabled")) {
+    element.style.visibility = "hidden";
+  }
 };
 
 const hideSpoiler = (element) => {
@@ -78,7 +87,7 @@ const hideSpoiler = (element) => {
   // only hide if parent is not already hidden?
   const childElements = element.children;
   for (const child of childElements) {
-    if (child.className !== "spoiler-info-box") {
+    if (!child.classList.contains("spoiler-blocker-info-box")) {
       child.style.visibility = "hidden";
     }
   }
@@ -90,8 +99,9 @@ const showSpoiler = (element, bg, color) => {
 
   const childElements = element.children;
   for (const child of childElements) {
-    if (child.className === "spoiler-info-box") {
+    if (child.classList.contains("spoiler-blocker-info-box")) {
       child.style.visibility = "hidden";
+      child.classList.add("spoiler-blocker-info-box-disabled");
     } else {
       child.style.visibility = "initial";
     }
@@ -138,13 +148,26 @@ const filterSpoilers = (seriesList) => {
     );
   });
 };
-
-// add handling for nested spoilers
+// add better handling for nested spoilers
 
 let seriesList;
+MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+var observer = new MutationObserver(function (mutations, observer) {
+  observer.disconnect();
+  filterSpoilers(seriesList);
+  observer.observe(document, {
+    subtree: true,
+    childList: true,
+  });
+});
+
 chrome.storage.local.get(["seriesList"], (res) => {
   seriesList = res.seriesList || [];
-  filterSpoilers(seriesList);
+  observer.observe(document, {
+    subtree: true,
+    childList: true,
+  });
 });
 
 // add message trigger when new keyword or series is added
