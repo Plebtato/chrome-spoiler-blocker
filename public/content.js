@@ -98,16 +98,15 @@ const hideSpoiler = (element) => {
   }
 };
 
-const showSpoiler = (element, bg, color) => {
+const showSpoiler = (element, infoBox, bg, color) => {
   element.style.backgroundColor = bg;
   element.style.color = color;
+  infoBox.style.visibility = "hidden";
+  infoBox.classList.add("spoiler-blocker-info-box-disabled");
 
   const childElements = element.children;
   for (const child of childElements) {
-    if (child.classList.contains("spoiler-blocker-info-box")) {
-      child.style.visibility = "hidden";
-      child.classList.add("spoiler-blocker-info-box-disabled");
-    } else {
+    if (!child.classList.contains("spoiler-blocker-info-box")) {
       child.style.visibility = "initial";
     }
   }
@@ -140,7 +139,7 @@ const filterSpoilers = (seriesList) => {
     spoiler.element.addEventListener("click", (e) => {
       if (hidden) {
         e.preventDefault();
-        showSpoiler(spoiler.element, originalBG, originalColor);
+        showSpoiler(spoiler.element, infoBox, originalBG, originalColor);
         hidden = false;
       } else {
         infoBox.style.visibility = "hidden";
