@@ -56,6 +56,9 @@ const createSpoilerInfoBox = (element, spoilerInfo) => {
   node.style.whiteSpace = "pre-line";
   node.style.zIndex = "99999";
   node.style.position = "fixed";
+  node.style.transform = "none";
+  node.style.filter = "none";
+  node.style.perspective  = "none";
 
   element.onmousemove = (e) => {
     let x = e.clientX;
@@ -71,12 +74,14 @@ const createSpoilerInfoBox = (element, spoilerInfo) => {
 
 const showSpoilerInfoBox = (element) => {
   if (!element.classList.contains("spoiler-blocker-info-box-disabled")) {
+    document.body.appendChild(element);
     element.style.visibility = "visible";
   }
 };
 
-const hideSpoilerInfoBox = (element) => {
+const hideSpoilerInfoBox = (element, parent) => {
   if (!element.classList.contains("spoiler-blocker-info-box-disabled")) {
+    parent.appendChild(element);
     element.style.visibility = "hidden";
   }
 };
@@ -137,6 +142,8 @@ const filterSpoilers = (seriesList) => {
         e.preventDefault();
         showSpoiler(spoiler.element, originalBG, originalColor);
         hidden = false;
+      } else {
+        infoBox.style.visibility = "hidden";
       }
     });
 
@@ -144,7 +151,7 @@ const filterSpoilers = (seriesList) => {
       showSpoilerInfoBox(infoBox)
     );
     spoiler.element.addEventListener("mouseleave", () =>
-      hideSpoilerInfoBox(infoBox)
+      hideSpoilerInfoBox(infoBox, spoiler.element)
     );
   });
 };
