@@ -24,7 +24,7 @@ function App() {
   const apiKey = process.env.REACT_APP_IMDB_API_KEY;
 
   useEffect(() => {
-    chrome.storage.local.get(["seriesList"], (res) => {
+    chrome.storage.sync.get(["seriesList"], (res) => {
       const storedList = res.seriesList || [];
       setSeriesList(storedList);
       setInitialLoad(false);
@@ -33,7 +33,7 @@ function App() {
 
   useEffect(() => {
     if (!initialLoad) {
-      chrome.storage.local.set({ seriesList: seriesList });
+      chrome.storage.sync.set({ seriesList: seriesList });
     }
   }, [seriesList, initialLoad]);
 

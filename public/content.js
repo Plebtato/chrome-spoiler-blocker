@@ -168,7 +168,7 @@ var observer = new MutationObserver(function (mutations, observer) {
   });
 });
 
-chrome.storage.local.get(["seriesList"], (res) => {
+chrome.storage.sync.get(["seriesList"], (res) => {
   seriesList = res.seriesList || [];
   observer.observe(document, {
     subtree: true,
