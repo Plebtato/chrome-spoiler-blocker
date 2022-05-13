@@ -1,4 +1,12 @@
-# Getting Started with Create React App
+# Spoiler Blocker Extension for Google Chrome
+
+Filter out spoilers for films and television series on popular social media sites including Twitter, Facebook, Reddit, Instagram, and Youtube.
+
+If you want to use the autofill feature to automatically add info for selected shows and movies to the blacklist, add REACT_APP_IMDB_API_KEY=YOUR_KEY to .env
+
+![Blocker UI](https://i.imgur.com/FOuEwbq.png)
+
+![Blocker in action](https://i.imgur.com/Y7It4Ox.gif)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
